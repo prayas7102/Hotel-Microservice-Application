@@ -22,18 +22,18 @@ public class HotelController {
 	private HotelService hotelService;
 
 	@PostMapping
-	public ResponseEntity<Hotel> createUser(@RequestBody Hotel hotel) {
-		return ResponseEntity.status(HttpStatus.CREATED).body(hotel);
+	public ResponseEntity<Hotel> createHotel(@RequestBody Hotel hotel) {
+		return ResponseEntity.status(HttpStatus.CREATED).body(hotelService.create(hotel));
 	}
 
 	@GetMapping("/{Id}")
-	public ResponseEntity<Hotel> getSingleUser(@PathVariable String Id) {
+	public ResponseEntity<Hotel> getSingleHotel(@PathVariable String Id) {
 		Hotel hotel = hotelService.getHotel(Id);
 		return ResponseEntity.ok(hotel);
 	}
 
 	@GetMapping
-	public ResponseEntity<List<Hotel>> getAllUser() {
+	public ResponseEntity<List<Hotel>> getAllHotel() {
 		return ResponseEntity.ok(hotelService.getAll());
 	}
 }

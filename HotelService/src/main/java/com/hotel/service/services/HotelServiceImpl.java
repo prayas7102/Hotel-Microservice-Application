@@ -1,6 +1,7 @@
 package com.hotel.service.services;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,8 @@ public class HotelServiceImpl implements HotelService {
 
 	@Override
 	public Hotel create(Hotel hotel) {
+		String randomHotelId = UUID.randomUUID().toString();
+		hotel.setId(randomHotelId);
 		return hotelRepository.save(hotel);
 	}
 
@@ -28,7 +31,7 @@ public class HotelServiceImpl implements HotelService {
 	@Override
 	public Hotel getHotel(String Id) {
 		return hotelRepository.findById(Id)
-				.orElseThrow(() -> new ResourceNotFoundException("hotel with id not found" + Id));
+				.orElseThrow(() -> new ResourceNotFoundException("hotel with id not found " + Id));
 	}
 
 }
