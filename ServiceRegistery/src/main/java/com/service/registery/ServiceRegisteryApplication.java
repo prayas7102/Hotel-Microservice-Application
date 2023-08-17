@@ -1,13 +1,13 @@
- package com.hotel.service;
+package com.service.registery;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class HotelServiceApplication {
+public class ServiceRegisteryApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(HotelServiceApplication.class, args);
+		SpringApplication.run(ServiceRegisteryApplication.class, args);
 	}
 
 }
