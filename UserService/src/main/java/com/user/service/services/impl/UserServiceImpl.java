@@ -5,12 +5,17 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.user.service.entity.Hotel;
 import com.user.service.entity.Rating;
 import com.user.service.entity.User;
 import com.user.service.exceptions.ResourceNotFoundException;
+import com.user.service.externalServices.ExternalServices;
 import com.user.service.repository.UserRepository;
 import com.user.service.services.UserService;
 
@@ -23,6 +28,9 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private RestTemplate restTemplate;
 
+	@Autowired
+	ExternalServices externalServices;
+	
 	@Override
 	public User saveUser(User user) {
 		String randomUserId = UUID.randomUUID().toString();
@@ -34,9 +42,19 @@ public class UserServiceImpl implements UserService {
 	public List<User> getAllUser() {
 		List<User> userList = userRepository.findAll();
 		for (User user : userList) {
-			@SuppressWarnings("unchecked")
-			ArrayList<Rating> ratingsOfUser = restTemplate
-					.getForObject("http://RATING-SERVICE/ratings/users/" + user.getUserId(), ArrayList.class);
+			ResponseEntity<ArrayList<Rating>> responseEntity = restTemplate.exchange(
+					"http://RATING-SERVICE/ratings/users/" + user.getUserId(), HttpMethod.GET, null,
+					new ParameterizedTypeReference<ArrayList<Rating>>() {
+					});
+
+			ArrayList<Rating> ratingsOfUser = responseEntity.getBody();
+
+			for (Rating rating : ratingsOfUser) {
+//				Hotel hotel = restTemplate.getForObject("http://HOTEL-SERVICE/hotels/" + rating.getHotelId(),
+//						Hotel.class);
+				Hotel hotel = externalServices.getHotel(rating.getHotelId());
+				rating.setHotel(hotel);
+			}
 			user.setRatings(ratingsOfUser);
 		}
 		return userList;
@@ -47,9 +65,18 @@ public class UserServiceImpl implements UserService {
 		User user = userRepository.findById(UserId)
 				.orElseThrow(() -> new ResourceNotFoundException(UserId + " user not found"));
 
-		@SuppressWarnings("unchecked")
-		ArrayList<Rating> ratingsOfUser = restTemplate
-				.getForObject("http://RATING-SERVICE/ratings/users/" + user.getUserId(), ArrayList.class);
+		ResponseEntity<ArrayList<Rating>> responseEntity = restTemplate.exchange(
+				"http://RATING-SERVICE/ratings/users/" + user.getUserId(), HttpMethod.GET, null,
+				new ParameterizedTypeReference<ArrayList<Rating>>() {
+				});
+
+		ArrayList<Rating> ratingsOfUser = responseEntity.getBody();
+
+		for (Rating rating : ratingsOfUser) {
+//			Hotel hotel = restTemplate.getForObject("http://HOTEL-SERVICE/hotels/" + rating.getHotelId(), Hotel.class);
+			Hotel hotel = externalServices.getHotel(rating.getHotelId());
+			rating.setHotel(hotel);
+		}
 		user.setRatings(ratingsOfUser);
 		return user;
 	}
